@@ -1,13 +1,12 @@
 name: screenshot_recording_detector
 description: A Flutter plugin to detect screenshots and screen recordings on Android and iOS with additional security features like blurring protected content.
-version: 1.0.0
+version: 1.1.0
 homepage: https://github.com/academix-admin/screenshot_recording_detector
 repository: https://github.com/academix-admin/screenshot_recording_detector
-publish_to: https://pub.dev
 
 environment:
-  sdk: ^3.7.2
-  flutter: '>=3.3.0'
+  sdk: '>=3.3.4 <4.0.0'
+
 
 dependencies:
   flutter:
