@@ -4,6 +4,6 @@
 ## 1.1.0
 - SDK resolve
 
-## 1.7.0
+## 1.8.0
 - Import resolve
 

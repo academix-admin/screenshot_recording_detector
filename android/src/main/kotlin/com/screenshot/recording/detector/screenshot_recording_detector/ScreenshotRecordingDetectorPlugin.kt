@@ -55,7 +55,7 @@ class ScreenshotRecordingDetectorPlugin : FlutterPlugin, MethodCallHandler {
     when (call.method) {
       "initialize" -> {
         startMonitoring()
-        checkBatteryOptimization()
+//        checkBatteryOptimization()
         result.success(null)
       }
       "isScreenRecording" -> {
