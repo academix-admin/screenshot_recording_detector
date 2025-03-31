@@ -185,8 +185,6 @@ class ScreenshotRecordingDetectorPlugin : FlutterPlugin, MethodCallHandler {
       // Check if the intent can be resolved
       if (intent.resolveActivity(context?.packageManager!!) != null) {
         context?.startActivity(intent)
-      } else {
-        Log.e("BatteryOptimization", "Cannot resolve intent")
       }
     }
   }
