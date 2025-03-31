@@ -178,8 +178,16 @@ class ScreenshotRecordingDetectorPlugin : FlutterPlugin, MethodCallHandler {
       val packageName = context?.packageName ?: return
       val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
         data = Uri.parse("package:$packageName")
+        // Add this flag when starting from non-Activity context
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
       }
-      context?.startActivity(intent)
+
+      // Check if the intent can be resolved
+      if (intent.resolveActivity(context?.packageManager!!) != null) {
+        context?.startActivity(intent)
+      } else {
+        Log.e("BatteryOptimization", "Cannot resolve intent")
+      }
     }
   }
 
