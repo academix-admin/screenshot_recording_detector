@@ -30,7 +30,7 @@ abstract class ScreenshotRecordingDetectorPlatform extends PlatformInterface {
   }
 
   /// Returns a stream of platform events converted to maps.
-  Stream<Map<String, dynamic>> get detectionStream {
+  Stream<Map<dynamic, dynamic>> get detectionStream {
     throw UnimplementedError('detectionStream has not been implemented.');
   }
 

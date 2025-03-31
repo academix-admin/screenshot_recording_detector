@@ -145,30 +145,35 @@ class ScreenshotRecordingDetectorPlugin : FlutterPlugin, MethodCallHandler {
     return false
   }
 
+
   @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
   private fun isScreenRecording(): Boolean {
+    // Method 1: Check for virtual displays
+    val displayManager = context?.getSystemService(Context.DISPLAY_SERVICE) as? DisplayManager
+    displayManager?.displays?.forEach { display ->
+      if (display.flags and Display.FLAG_SECURE != 0 ||
+        display.flags and Display.FLAG_PRESENTATION != 0 ||
+        display.name.contains("Overlay") ||
+        display.name.contains("Virtual")) {
+        return true
+      }
+    }
+
+    // Method 2: Check for media projection (alternative approach)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
       val mediaProjectionManager = context?.getSystemService(Context.MEDIA_PROJECTION_SERVICE) as? MediaProjectionManager
       try {
-        // Alternative check using reflection
-        val mServiceField = MediaProjectionManager::class.java.getDeclaredField("mService")
-        mServiceField.isAccessible = true
-        val mService = mServiceField.get(mediaProjectionManager)
-        if (mService != null) {
+        // Alternative check without reflection
+        val intent = mediaProjectionManager?.createScreenCaptureIntent()
+        if (intent != null && intent.resolveActivity(context?.packageManager!!) != null) {
+          // This doesn't guarantee recording is active, but suggests the capability exists
           return true
         }
       } catch (e: Exception) {
-        // Fallback to display flags
-        val displayManager = context?.getSystemService(Context.DISPLAY_SERVICE) as? DisplayManager
-        displayManager?.displays?.forEach { display ->
-          if (display.flags and Display.FLAG_SECURE != 0 ||
-            display.flags and Display.FLAG_PRESENTATION != 0
-          ) {
-            return true
-          }
-        }
+        // Fall through
       }
     }
+
     return false
   }
 

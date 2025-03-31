@@ -22,8 +22,13 @@ class MethodChannelScreenshotRecordingDetector
   }
 
   @override
-  Stream<Map<String, dynamic>> get detectionStream {
-    return eventChannel.receiveBroadcastStream().cast<Map<String, dynamic>>();
+  Stream<Map<dynamic, dynamic>> get detectionStream {
+    return eventChannel.receiveBroadcastStream().map((event) {
+      if (event is Map) {
+        return event.cast<dynamic, dynamic>();
+      }
+      return <dynamic, dynamic>{};
+    });
   }
 
   @override
