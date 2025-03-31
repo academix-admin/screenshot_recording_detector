@@ -10,3 +10,6 @@
 ## 1.3.0
 - Import resolve
 
+## 1.4.0
+- Import resolve
+
