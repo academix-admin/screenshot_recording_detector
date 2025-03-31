@@ -1,9 +1,10 @@
 package com.screenshot.recording.detector.screenshot_recording_detector
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ContentResolver
 import android.content.Context
-import android.content.Intent
+import android.database.ContentObserver
 import android.hardware.display.DisplayManager
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
@@ -13,12 +14,18 @@ import android.os.Looper
 import android.provider.MediaStore
 import android.provider.Settings
 import android.view.Display
+import android.view.WindowManager
+import androidx.annotation.RequiresApi
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import android.content.Intent
+import android.content.Intent.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+import android.net.Uri
+import android.media.projection.MediaProjectionManager
 
 class ScreenshotRecordingDetectorPlugin : FlutterPlugin, MethodCallHandler {
   private lateinit var channel: MethodChannel
@@ -139,20 +146,18 @@ class ScreenshotRecordingDetectorPlugin : FlutterPlugin, MethodCallHandler {
     return false
   }
 
-  @SuppressLint("ObsoleteSdkInt")
+  @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
   private fun isScreenRecording(): Boolean {
-    // Method 1: MediaProjection
     val mediaProjectionManager = context?.getSystemService(Context.MEDIA_PROJECTION_SERVICE) as? MediaProjectionManager
-    if (mediaProjectionManager?.activeProjectionInfo != null) return true
 
-    // Method 2: Secure displays
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+    // Updated check for active projection
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+      if (mediaProjectionManager?.activeProjection != null) return true
+    } else {
+      // Alternative check for older versions
       val displayManager = context?.getSystemService(Context.DISPLAY_SERVICE) as? DisplayManager
-      val displays = displayManager?.displays
-      displays?.forEach { display ->
-        if (display.flags and Display.FLAG_SECURE != 0) {
-          return true
-        }
+      displayManager?.displays?.forEach { display ->
+        if (display.flags and Display.FLAG_SECURE != 0) return true
       }
     }
     return false
@@ -161,7 +166,7 @@ class ScreenshotRecordingDetectorPlugin : FlutterPlugin, MethodCallHandler {
   @SuppressLint("BatteryLife")
   private fun checkBatteryOptimization() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+      val intent = Intent(ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
         data = Uri.parse("package:${context?.packageName}")
       }
       context?.startActivity(intent)
